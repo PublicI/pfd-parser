@@ -1,72 +1,111 @@
-/* Any copyright is dedicated to the Public Domain.
- * http://creativecommons.org/publicdomain/zero/1.0/ */
+// Started as a PDF.js example file, originally licensed public domain
 
-//
-// Basic node example that prints document metadata and text content.
-// Requires single file built version of PDF.js -- please run
-// `gulp singlefile` before running the example.
-//
+var fs = require('fs'),
+    util = require('util');
 
-var fs = require('fs');
-
-// HACK adding DOMParser to read XMP metadata.
 global.DOMParser = require('./lib/domparsermock.js').DOMParserMock;
 
-// Run `gulp dist` to generate 'pdfjs-dist' npm package files.
 var pdfjsLib = require('pdfjs-dist');
 
-// Loading file from file system into typed array
-var pdfPath = process.argv[2] || './test/data/compressed.tracemonkey-pldi-09.pdf';
+var pdfPath = process.argv[2] || './test/data/Ross Wilbur L. Final 278.pdf';
 var data = new Uint8Array(fs.readFileSync(pdfPath));
 
-// Will be using promises to load document, pages and misc data instead of
-// callback.
+var tables = [];
+
 pdfjsLib.getDocument(data).then(function(doc) {
     var numPages = doc.numPages;
-    console.log('# Document Loaded');
-    console.log('Number of Pages: ' + numPages);
-    console.log();
 
     var lastPromise; // will be used to chain promises
-    lastPromise = doc.getMetadata().then(function(data) {
-        console.log('# Metadata Is Loaded');
-        console.log('## Info');
-        console.log(JSON.stringify(data.info, null, 2));
-        console.log();
-        if (data.metadata) {
-            console.log('## Metadata');
-            console.log(JSON.stringify(data.metadata.metadata, null, 2));
-            console.log();
-        }
-    });
 
     var loadPage = function(pageNum) {
         return doc.getPage(pageNum).then(function(page) {
-            console.log('# Page ' + pageNum);
+
             var viewport = page.getViewport(1.0 /* scale */ );
-            console.log('Size: ' + viewport.width + 'x' + viewport.height);
-            console.log();
+
             return page.getTextContent().then(function(content) {
-                // Content contains lots of information about the text layout and
-                // styles, but we need only strings at the moment
-                var strings = content.items.map(function(item) {
-                    return item.str;
+
+                var ignorePage = false;
+
+                content.items.forEach(function (item,i) {
+
+                    if (!ignorePage) {
+                        if (item.height == 14) {
+                            if (item.str == 'Filer\'s Information') {
+                                ignorePage = true;
+                            }
+                            else if (item.str == 'Summary of Contents') {
+                                ignorePage = true;
+                            }
+                            else if (item.str.trim().length > 2) {
+                                var headerParts = item.str.split('. ');
+
+                                tables.push({
+                                    part: parseInt(headerParts[0]),
+                                    name: headerParts.slice(1).join('. '),
+                                    cols: [],
+                                    rows: []
+                                });
+                            }
+                        }
+                        else if (item.height == 10) {
+                            var curTable = tables[tables.length-1];
+
+                            if (item.fontName == 'g_d0_f2') {
+                                if (item.str == 'PART' || (item.str == '#' && curTable.cols.length > 1)) {
+                                    curTable.cols = [];
+                                }
+
+                                var append = true;
+
+                                curTable.cols.forEach(function (col) {
+                                    if (col.x == item.transform[5]) {
+                                        col.name += ' ' + item.str;
+                                        col.slug = col.name.toLowerCase().replace(/[ ,]+/g,'-');
+                                        append = false;
+                                    }
+                                });
+
+                                if (append) {
+                                    curTable.cols.push({
+                                        name: item.str,
+                                        slug: item.str.toLowerCase().replace(/[ ,]+/g,'-'),
+                                        x: item.transform[5],
+                                        y: item.transform[4]
+                                    });
+                                }
+                            }
+                            else {
+                                curTable.cols.forEach(function (col,i2) {
+                                    if (col.x == item.transform[5]) {
+                                        if (i2 === 0 && content.items[i-1].transform[5] !== item.transform[5]) {
+                                            curTable.rows.push({});
+                                        }
+                                        var curRow = curTable.rows[curTable.rows.length-1];
+
+                                        if (col.slug in curRow) {
+                                            curRow[col.slug] += '\n' + item.str;
+                                        }
+                                        else {
+                                            curRow[col.slug] = item.str;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
                 });
-                console.log('## Text Content');
-                console.log(strings.join(' '));
-            }).then(function() {
-                console.log();
+
             });
         });
     };
-    // Loading of the first page will wait on metadata and subsequent loadings
-    // will wait on the previous pages.
-    for (var i = 1; i <= numPages; i++) {
+
+    lastPromise = loadPage(2);
+    for (var i = 3; i <= numPages-4; i++) {
         lastPromise = lastPromise.then(loadPage.bind(null, i));
     }
     return lastPromise;
 }).then(function() {
-    console.log('# End of Document');
+    console.log(JSON.stringify(tables));
 }, function(err) {
     console.error('Error: ' + err);
 });
