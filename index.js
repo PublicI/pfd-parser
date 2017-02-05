@@ -1,111 +1,177 @@
 // Started as a PDF.js example file, originally licensed public domain
 
 var fs = require('fs'),
-    util = require('util');
+    util = require('util'),
+    dsv = require('d3-dsv'),
+    path = require('path');
 
 global.DOMParser = require('./lib/domparsermock.js').DOMParserMock;
 
 var pdfjsLib = require('pdfjs-dist');
 
-var pdfPath = process.argv[2] || './test/data/Ross Wilbur L. Final 278.pdf';
-var data = new Uint8Array(fs.readFileSync(pdfPath));
+var filePath = __dirname + '/test/data/';
 
-var tables = [];
+function processFiling(pdfPath) {
+    var data = new Uint8Array(fs.readFileSync(pdfPath));
 
-pdfjsLib.getDocument(data).then(function(doc) {
-    var numPages = doc.numPages;
+    var tables = [];
 
-    var lastPromise; // will be used to chain promises
+    var ignoreRest = false;
 
-    var loadPage = function(pageNum) {
-        return doc.getPage(pageNum).then(function(page) {
+    return pdfjsLib.getDocument(data).then(function(doc) {
+        var numPages = doc.numPages;
 
-            var viewport = page.getViewport(1.0 /* scale */ );
+        var lastPromise; // will be used to chain promises
 
-            return page.getTextContent().then(function(content) {
+        var loadPage = function(pageNum) {
+            return doc.getPage(pageNum).then(function(page) {
 
-                var ignorePage = false;
+                var viewport = page.getViewport(1.0 /* scale */ );
 
-                content.items.forEach(function (item,i) {
+                return page.getTextContent().then(function(content) {
 
-                    if (!ignorePage) {
-                        if (item.height == 14) {
-                            if (item.str == 'Filer\'s Information') {
-                                ignorePage = true;
-                            }
-                            else if (item.str == 'Summary of Contents') {
-                                ignorePage = true;
-                            }
-                            else if (item.str.trim().length > 2) {
-                                var headerParts = item.str.split('. ');
+                    var boldFont = '';
 
-                                tables.push({
-                                    part: parseInt(headerParts[0]),
-                                    name: headerParts.slice(1).join('. '),
-                                    cols: [],
-                                    rows: []
-                                });
-                            }
+                    var styleKeys = Object.keys(content.styles);
+                    styleKeys.forEach(function (styleKey) {
+                        if (content.styles[styleKey].fontFamily == 'sans-serif' && 
+                            content.styles[styleKey].descent < -0.295) {
+                            boldFont = styleKey;
                         }
-                        else if (item.height == 10) {
-                            var curTable = tables[tables.length-1];
+                    });
 
-                            if (item.fontName == 'g_d0_f2') {
-                                if (item.str == 'PART' || (item.str == '#' && curTable.cols.length > 1)) {
-                                    curTable.cols = [];
+                    var ignorePage = false;
+                    var rowY = 0;
+
+                    content.items.sort(function (a,b) {
+                        if (a.transform[4]-b.transform[4] !== 0) {
+                            return a.transform[4]-b.transform[4];
+                        }
+                        else {
+                            return a.transform[5]-b.transform[5];
+                        }
+                    }).forEach(function (item,i) {
+                        if (!ignorePage && !ignoreRest) {
+                            if (item.height == 14) {
+                                if (item.str == 'Filer\'s Information') {
+                                    ignorePage = true;
                                 }
+                                else if (item.str == 'Summary of Contents') {
+                                    ignoreRest = true;
+                                }
+                                else if (item.str.trim().length > 2) {
+                                    var headerParts = item.str.split('. ');
+                                    var part = null,
+                                        name = null;
 
-                                var append = true;
-
-                                curTable.cols.forEach(function (col) {
-                                    if (col.x == item.transform[5]) {
-                                        col.name += ' ' + item.str;
-                                        col.slug = col.name.toLowerCase().replace(/[ ,]+/g,'-');
-                                        append = false;
+                                    if (headerParts.length > 1) {
+                                        part = parseInt(headerParts[0]);
+                                        name = headerParts.slice(1).join('. ');
                                     }
-                                });
+                                    else {
+                                        name = item.str;
+                                    }
 
-                                if (append) {
-                                    curTable.cols.push({
-                                        name: item.str,
-                                        slug: item.str.toLowerCase().replace(/[ ,]+/g,'-'),
-                                        x: item.transform[5],
-                                        y: item.transform[4]
+                                    tables.push({
+                                        part: part,
+                                        name: name,
+                                        cols: [],
+                                        rows: []
                                     });
                                 }
                             }
-                            else {
-                                curTable.cols.forEach(function (col,i2) {
-                                    if (col.x == item.transform[5]) {
-                                        if (i2 === 0 && content.items[i-1].transform[5] !== item.transform[5]) {
-                                            curTable.rows.push({});
-                                        }
-                                        var curRow = curTable.rows[curTable.rows.length-1];
+                            else if (item.height == 10) {
+                                var curTable = tables[tables.length-1];
 
-                                        if (col.slug in curRow) {
-                                            curRow[col.slug] += '\n' + item.str;
-                                        }
-                                        else {
-                                            curRow[col.slug] = item.str;
-                                        }
+                                if (item.fontName == boldFont) {
+                                    if (item.str == 'PART' || (item.str == '#' && curTable.cols.length > 1)) {
+                                        curTable.cols = [];
                                     }
-                                });
+
+                                    var append = true;
+
+                                    curTable.cols.forEach(function (col) {
+                                        if (col.x == item.transform[5]) {
+                                            col.name += ' ' + item.str;
+                                            col.slug = col.name.toLowerCase().replace(/[ ,]+/g,'-');
+                                            append = false;
+                                        }
+                                    });
+
+                                    if (append) {
+                                        curTable.cols.push({
+                                            name: item.str,
+                                            slug: item.str.toLowerCase().replace(/[ ,]+/g,'-'),
+                                            x: item.transform[5],
+                                            y: item.transform[4]
+                                        });
+                                    }
+                                }
+                                else {
+                                    curTable.cols.forEach(function (col,i2) {
+                                        if (col.x == item.transform[5]) {
+                                            if (i2 === 0 && item.transform[4]-rowY > 12) {
+                                                curTable.rows.push({});
+                                                rowY = item.transform[4];
+                                            }
+                                            var curRow = curTable.rows[curTable.rows.length-1];
+
+                                            if (col.slug in curRow) {
+                                                if (col.slug !== '#') {
+                                                    curRow[col.slug] += ' ';
+                                                }
+                                                curRow[col.slug] += item.str;
+                                            }
+                                            else {
+                                                curRow[col.slug] = item.str;
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
-                    }
+                    });
+
+                });
+            });
+        };
+
+        lastPromise = loadPage(2);
+        for (var i = 3; i <= numPages-4; i++) {
+            lastPromise = lastPromise.then(loadPage.bind(null, i));
+        }
+        return lastPromise;
+    }).then(function() {
+        var fileName = path.basename(pdfPath,'.pdf');
+
+        return new Promise(function (resolve,reject) {
+            tables.forEach(function (table) {
+                var csvFile = filePath + table.name.toLowerCase().replace(/[ ,']+/g,'-') + '.csv';
+
+                table.rows.forEach(function (row) {
+                    row.file = fileName;
                 });
 
+                if (table.cols.length > 0) {
+                    fs.appendFileSync(csvFile,dsv.csvFormat(table.rows,['file'].concat(table.cols.map(function (col) {
+                        return col.slug;
+                    })))+'\n');
+                }
             });
-        });
-    };
 
-    lastPromise = loadPage(2);
-    for (var i = 3; i <= numPages-4; i++) {
-        lastPromise = lastPromise.then(loadPage.bind(null, i));
-    }
-    return lastPromise;
-}).then(function() {
-    console.log(JSON.stringify(tables));
-}, function(err) {
-    console.error('Error: ' + err);
+            resolve();
+        });
+    });
+}
+
+var files = fs.readdirSync(filePath).filter(function (file) {
+    return file.indexOf('.pdf') !== -1;
+});
+
+var filingPromise = processFiling(filePath + files[0]);
+for (var pos = 1; pos < files.length; pos++) {
+    filingPromise = filingPromise.then(processFiling.bind(null,filePath + files[pos]));
+}
+filingPromise.then(function () {
+    console.log('done');
 });
