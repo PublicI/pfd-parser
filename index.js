@@ -25,11 +25,9 @@ function processFiling(pdfPath) {
 
         var loadPage = function(pageNum) {
             return doc.getPage(pageNum).then(function(page) {
-
                 var viewport = page.getViewport(1.0 /* scale */ );
 
                 return page.getTextContent().then(function(content) {
-
                     var boldFont = '';
 
                     var styleKeys = Object.keys(content.styles);
@@ -51,6 +49,10 @@ function processFiling(pdfPath) {
                             return a.transform[5]-b.transform[5];
                         }
                     }).forEach(function (item,i) {
+                        if (item.str.indexOf('Data Revised') !== -1) {
+                            ignorePage = true;
+                        }
+
                         if (!ignorePage && !ignoreRest) {
                             if (item.height == 14) {
                                 if (item.str == 'Filer\'s Information') {
