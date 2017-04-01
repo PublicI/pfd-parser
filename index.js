@@ -14,6 +14,8 @@ var filePath = __dirname + '/test/data/';
 function processFiling(pdfPath) {
     var data = new Uint8Array(fs.readFileSync(pdfPath));
 
+    console.log(pdfPath);
+
     var tables = [];
 
     var ignoreRest = false;
@@ -49,7 +51,8 @@ function processFiling(pdfPath) {
                             return a.transform[5]-b.transform[5];
                         }
                     }).forEach(function (item,i) {
-                        if (item.str.indexOf('Data Revised') !== -1) {
+                        if (item.str.indexOf('Data Revised') !== -1 ||
+                            item.str === 'U.S. Office of Government Ethics Certification') {
                             ignorePage = true;
                         }
 
