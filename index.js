@@ -8,10 +8,10 @@ var fs = require('fs'),
 global.DOMParser = require('./lib/domparsermock.js').DOMParserMock;
 
 var pdfjsLib = require('pdfjs-dist');
-
 var filePath = __dirname + '/test/data/';
+var skipHeaders = {};
 
-function processFiling(pdfPath, includeHeader) {
+function processFiling(pdfPath) {
     var data = new Uint8Array(fs.readFileSync(pdfPath));
 
     var tables = [];
@@ -147,7 +147,6 @@ function processFiling(pdfPath, includeHeader) {
         return lastPromise;
     }).then(function() {
         var fileName = path.basename(pdfPath,'.pdf');
-
         return new Promise(function (resolve, reject) {
             tables.forEach(function (table) {
                 var csvFile = filePath + table.name.toLowerCase().replace(/[ ,']+/g,'-') + '.csv';
@@ -160,11 +159,13 @@ function processFiling(pdfPath, includeHeader) {
                     var columns = ['file'].concat(table.cols.map(function (col) {
                         return col.slug;
                     }));
-                    if (includeHeader) {
-                        fs.appendFileSync(csvFile, dsv.csvFormat(table.rows, columns) + '\n');
+                    var csvString = dsv.csvFormat(table.rows, columns);
+                    if (skipHeaders[table.name]) {
+                        csvString = csvString.substring(csvString.indexOf('\n')+1);
                     } else {
-                        fs.appendFileSync(csvFile, dsv.csvFormat(table.rows, columns) + '\n');
+                        skipHeaders[table.name] = true;
                     }
+                    fs.appendFileSync(csvFile, csvString + '\n');
                 }
             });
 
@@ -177,10 +178,11 @@ var files = fs.readdirSync(filePath).filter(function (file) {
     return file.indexOf('.pdf') !== -1;
 });
 
-var filingPromise = processFiling(filePath + files[0], true).catch();
+var filingPromise = processFiling(filePath + files[0]);
 for (var pos = 1; pos < files.length; pos++) {
     filingPromise = filingPromise
-        .then(processFiling.bind(null, filePath + files[pos], false), function(reason) { console.log(reason) });
+        .then(processFiling.bind(null, filePath + files[pos]),
+            function(reason) { console.log(reason) });
 }
 filingPromise.then(function () {
     console.log('done');
