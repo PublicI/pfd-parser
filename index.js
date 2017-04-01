@@ -11,7 +11,7 @@ var pdfjsLib = require('pdfjs-dist');
 
 var filePath = __dirname + '/test/data/';
 
-function processFiling(pdfPath) {
+function processFiling(pdfPath, includeHeader) {
     var data = new Uint8Array(fs.readFileSync(pdfPath));
 
     var tables = [];
@@ -84,51 +84,53 @@ function processFiling(pdfPath) {
                             }
                             else if (item.height == 10) {
                                 var curTable = tables[tables.length-1];
+                                if (curTable) {
 
-                                if (item.fontName == boldFont) {
-                                    if (item.str == 'PART' || (item.str == '#' && curTable.cols.length > 1)) {
-                                        curTable.cols = [];
-                                    }
-
-                                    var append = true;
-
-                                    curTable.cols.forEach(function (col) {
-                                        if (col.x == item.transform[5]) {
-                                            col.name += ' ' + item.str;
-                                            col.slug = col.name.toLowerCase().replace(/[ ,]+/g,'-');
-                                            append = false;
+                                    if (item.fontName == boldFont) {
+                                        if (item.str == 'PART' || (item.str == '#' && curTable.cols.length > 1)) {
+                                            curTable.cols = [];
                                         }
-                                    });
 
-                                    if (append) {
-                                        curTable.cols.push({
-                                            name: item.str,
-                                            slug: item.str.toLowerCase().replace(/[ ,]+/g,'-'),
-                                            x: item.transform[5],
-                                            y: item.transform[4]
+                                        var append = true;
+
+                                        curTable.cols.forEach(function (col) {
+                                            if (col.x == item.transform[5]) {
+                                                col.name += ' ' + item.str;
+                                                col.slug = col.name.toLowerCase().replace(/[ ,]+/g, '-');
+                                                append = false;
+                                            }
+                                        });
+
+                                        if (append) {
+                                            curTable.cols.push({
+                                                name: item.str,
+                                                slug: item.str.toLowerCase().replace(/[ ,]+/g, '-'),
+                                                x: item.transform[5],
+                                                y: item.transform[4]
+                                            });
+                                        }
+                                    }
+                                    else {
+                                        curTable.cols.forEach(function (col, i2) {
+                                            if (col.x == item.transform[5]) {
+                                                if (i2 === 0 && item.transform[4] - rowY > 12) {
+                                                    curTable.rows.push({});
+                                                    rowY = item.transform[4];
+                                                }
+                                                var curRow = curTable.rows[curTable.rows.length - 1];
+
+                                                if (col.slug in curRow) {
+                                                    if (col.slug !== '#') {
+                                                        curRow[col.slug] += ' ';
+                                                    }
+                                                    curRow[col.slug] += item.str;
+                                                }
+                                                else {
+                                                    curRow[col.slug] = item.str;
+                                                }
+                                            }
                                         });
                                     }
-                                }
-                                else {
-                                    curTable.cols.forEach(function (col,i2) {
-                                        if (col.x == item.transform[5]) {
-                                            if (i2 === 0 && item.transform[4]-rowY > 12) {
-                                                curTable.rows.push({});
-                                                rowY = item.transform[4];
-                                            }
-                                            var curRow = curTable.rows[curTable.rows.length-1];
-
-                                            if (col.slug in curRow) {
-                                                if (col.slug !== '#') {
-                                                    curRow[col.slug] += ' ';
-                                                }
-                                                curRow[col.slug] += item.str;
-                                            }
-                                            else {
-                                                curRow[col.slug] = item.str;
-                                            }
-                                        }
-                                    });
                                 }
                             }
                         }
@@ -146,7 +148,7 @@ function processFiling(pdfPath) {
     }).then(function() {
         var fileName = path.basename(pdfPath,'.pdf');
 
-        return new Promise(function (resolve,reject) {
+        return new Promise(function (resolve, reject) {
             tables.forEach(function (table) {
                 var csvFile = filePath + table.name.toLowerCase().replace(/[ ,']+/g,'-') + '.csv';
 
@@ -155,9 +157,14 @@ function processFiling(pdfPath) {
                 });
 
                 if (table.cols.length > 0) {
-                    fs.appendFileSync(csvFile,dsv.csvFormat(table.rows,['file'].concat(table.cols.map(function (col) {
+                    var columns = ['file'].concat(table.cols.map(function (col) {
                         return col.slug;
-                    })))+'\n');
+                    }));
+                    if (includeHeader) {
+                        fs.appendFileSync(csvFile, dsv.csvFormat(table.rows, columns) + '\n');
+                    } else {
+                        fs.appendFileSync(csvFile, dsv.csvFormat(table.rows, columns) + '\n');
+                    }
                 }
             });
 
@@ -170,9 +177,10 @@ var files = fs.readdirSync(filePath).filter(function (file) {
     return file.indexOf('.pdf') !== -1;
 });
 
-var filingPromise = processFiling(filePath + files[0]);
+var filingPromise = processFiling(filePath + files[0], true).catch();
 for (var pos = 1; pos < files.length; pos++) {
-    filingPromise = filingPromise.then(processFiling.bind(null,filePath + files[pos]));
+    filingPromise = filingPromise
+        .then(processFiling.bind(null, filePath + files[pos], false), function(reason) { console.log(reason) });
 }
 filingPromise.then(function () {
     console.log('done');
