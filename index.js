@@ -149,7 +149,7 @@ function processFiling(pdfPath) {
         }
         return lastPromise;
     }).then(() => {
-        const fileName = path.basename(pdfPath, '.pdf');
+        const fileName = path.basename(pdfPath, '.pdf').replace('.PDF','');
         return new Promise((resolve, reject) => {
             tables.forEach(table => {
                 const csvFile = `${filePath + table.name.toLowerCase().replace(/[ ,']+/g, '-')}.csv`;
@@ -176,7 +176,8 @@ function processFiling(pdfPath) {
     });
 }
 
-const files = fs.readdirSync(filePath).filter(file => file.includes('.pdf'));
+const files = fs.readdirSync(filePath)
+                        .filter(file => file.toLowerCase().includes('.pdf'));
 
 let filingPromise = processFiling(filePath + files[0]);
 for (let pos = 1; pos < files.length; pos++) {
