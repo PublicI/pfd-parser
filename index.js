@@ -4,7 +4,8 @@
 var fs = require('fs'),
     util = require('util'),
     dsv = require('d3-dsv'),
-    path = require('path');
+    path = require('path'),
+    glob = require('glob');
 
 global.DOMParser = require('./lib/domparsermock.js').DOMParserMock;
 
@@ -176,15 +177,19 @@ function processFiling(pdfPath) {
     });
 }
 
-const files = fs.readdirSync(filePath)
-                        .filter(file => file.toLowerCase().includes('.pdf'));
+glob(filePath + '**/*.pdf', function (err, files) {
+    if (err) {
+        throw err;
+    }
 
-let filingPromise = processFiling(filePath + files[0]);
-for (let pos = 1; pos < files.length; pos++) {
-    filingPromise = filingPromise
-        .then(processFiling.bind(null, filePath + files[pos]),
-            console.log);
-}
-filingPromise.then(() => {
-    console.log('done');
+    let filingPromise = processFiling(files[0]);
+    for (let pos = 1; pos < files.length; pos++) {
+        filingPromise = filingPromise
+            .then(processFiling.bind(null, files[pos]),
+                console.log);
+    }
+    filingPromise.then(() => {
+        console.log('done');
+    });
+
 });

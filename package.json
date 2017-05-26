@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "d3-dsv": "^1.0.3",
+    "glob": "^7.1.2",
     "pdfjs-dist": "^1.6.483"
   }
 }
