@@ -171,23 +171,26 @@ function processFiling(file) {
     const data = new Uint8Array(file.contents);
 
     // parse PDF document
-    return _(pdfjs.getDocument(data))
-        // get each page in the document
-        .flatMap(doc => {
-            let pages = [];
+    return new Promise((resolve,reject) => {
+        _(pdfjs.getDocument(data))
+            // get each page in the document
+            .flatMap(doc => {
+                let pages = [];
 
-            for (let i = 1; i <= doc.numPages; i++) {
-                pages.push(i);
-            }
+                for (let i = 1; i <= doc.numPages; i++) {
+                    pages.push(i);
+                }
 
-            return _(pages)
-                .map(page => _(doc.getPage(page)));
-        })
-        .flatten()
-        .map(processPage)
-        .done(() => {
-            saveFiling(file,tables)
-        });
+                return _(pages)
+                    .map(page => _(doc.getPage(page)));
+            })
+            .flatten()
+            .map(processPage)
+            .done(() => {
+                saveFiling(file,tables)
+                    .then(resolve,reject);
+            });
+    });
 }
 
 function processFilings(path) {
