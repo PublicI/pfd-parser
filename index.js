@@ -4,7 +4,6 @@
 const _ = require('highland'),
     dsv = require('d3-dsv'),
     fs = require('fs'),
-    path = require('path'),
     vfs = require('vinyl-fs');
 
 global.DOMParser = require('./lib/domparsermock.js').DOMParserMock;
@@ -191,8 +190,9 @@ function processFiling(file) {
         });
 }
 
-function processFilings(filingsPath) {
-    _(vfs.src(filingsPath + '**/*.pdf'))
+function processFilings(path) {
+    // process all PDFs in the directory
+    _(vfs.src(path + '**/*.pdf'))
         .map(processFiling)
         .done(() => {
             console.log('done');
