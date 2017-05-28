@@ -60,6 +60,8 @@ function saveFiling(file, tables) {
 
 function processFiling(file) {
 
+    console.log(file.relative);
+
     let tables = [];
     let ignoreRest = false;
 
