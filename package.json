@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index",
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "author": "",
   "license": "MIT",
@@ -13,5 +14,9 @@
     "highland": "^2.10.5",
     "pdfjs-dist": "^1.6.483",
     "vinyl-fs": "^2.4.4"
+  },
+  "devDependencies": {
+    "chai": "^4.0.0",
+    "mocha": "^3.4.2"
   }
 }
