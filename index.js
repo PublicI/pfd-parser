@@ -197,7 +197,7 @@ function processFiling(file) {
 
 function processFilings(path) {
     // process all PDFs in the directory
-    _(vfs.src(path + '**/*.pdf'))
+    _(vfs.src(path + '**/*.@(pdf|PDF)'))
         .map(processFiling)
         .done(() => {
             console.log('done');
