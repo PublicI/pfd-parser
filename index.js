@@ -34,6 +34,8 @@ function saveFiling(file, tables) {
         .replace('.pdf', '')
         .replace('.PDF', '');
 
+    let count = 0;
+
     return new Promise((resolve, reject) => {
         tables.forEach(table => {
             const csvFile = `${dataPath + table.name.toLowerCase().replace(/[ ,']+/g, '-')}.csv`;
@@ -45,23 +47,28 @@ function saveFiling(file, tables) {
             if (table.cols.length > 0) {
                 const columns = ['file'].concat(table.cols.map(col => col.slug));
                 let csvString = dsv.csvFormat(table.rows, columns);
+
                 if (skipHeaders[table.name]) {
                     csvString = csvString.substring(csvString.indexOf('\n') + 1);
-                } else {
+                }
+                else {
                     skipHeaders[table.name] = true;
                 }
+
                 fs.appendFileSync(csvFile, `${csvString}\n`);
+
+                count += table.rows.length;
             }
         });
 
-        resolve();
+        resolve({
+            count: count,
+            file: file
+        });
     });
 }
 
 function processFiling(file) {
-
-    console.log(file.relative);
-
     let tables = [];
     let ignoreRest = false;
 
@@ -198,10 +205,11 @@ function processFiling(file) {
 function processFilings(path) {
     // process all PDFs in the directory
     _(vfs.src(path + '**/*.@(pdf|PDF)'))
-        .map(processFiling)
-        .done(() => {
-            console.log('done');
-        });
+        .flatMap((file) => {
+            return _(processFiling(file))
+        })
+        .each(({file,count}) => console.log(file.relative,count))
+        .done(() => console.log('done'));
 }
 
 processFilings(filingsPath);
