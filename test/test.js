@@ -23,7 +23,7 @@ function processFiling(filePath,cb) {
 }
 
 describe('lib/filing.js', () => {
-    it('should find ten tables in Jared Kushner\'s filing', (done) => {
+    it('should find 10 tables in Jared Kushner\'s filing', (done) => {
        processFiling(kushner,(err,filing) => {
             filing.tables.length.should.equal(10);
 
