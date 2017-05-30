@@ -26,8 +26,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       organization-name:
         type: string
       city-state:
@@ -64,8 +63,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       description:
         type: string
       eif:
@@ -94,8 +92,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       employer-or-party:
         type: string
       city-state:
@@ -120,8 +117,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       source-name:
         type: string
       city-state:
@@ -154,8 +150,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       description:
         type: string
       eif:
@@ -188,8 +183,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       description:
         type: string
       eif:
@@ -216,8 +210,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       description:
         type: string
       type:
@@ -243,8 +236,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       creditor-name:
         type: string
       type:
@@ -281,8 +273,7 @@ definitions:
       file:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       source-name:
         type: string
       city-state:
@@ -300,7 +291,6 @@ definitions:
       part:
         type: string
       '#':
-        type: integer
-        format: int32
+        type: string
       endnote:
         type: string
