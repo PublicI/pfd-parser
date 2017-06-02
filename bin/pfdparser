@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+    pkg = require('../package.json'),
+    processFilings = require('../'),
+    fs = require('fs');
+
+program
+    .version(pkg.version);
+
+program
+    .usage('<filings path> <data path>')
+    .action((filingsPath, dataPath, options) => {
+        processFilings(filingsPath,dataPath);
+    });
+
+program.parse(process.argv);
+
+if (!process.argv.slice(2).length) {
+    program.outputHelp();
+}
