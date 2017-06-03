@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index",
+    "start": "node ./bin/pfdparser",
     "test": "./node_modules/mocha/bin/mocha"
   },
   "author": "",
@@ -13,6 +13,7 @@
     "commander": "^2.9.0",
     "d3-dsv": "^1.0.3",
     "highland": "^2.10.5",
+    "js-yaml": "^3.8.4",
     "pdfjs-dist": "^1.6.483",
     "vinyl-fs": "^2.4.4"
   },
