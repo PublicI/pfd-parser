@@ -10,8 +10,8 @@ const kushner = __dirname + '/data/Kushner, Jared.pdf';
 describe('lib/parser.js', () => {
     it('should find 10 tables in Jared Kushner\'s filing', (done) => {
         parser(kushner)
-            .then((filing) => {
-                filing.tables.length.should.equal(10);
+            .then((filings) => {
+                filings[0].tables.length.should.equal(10);
 
                 done();
             });

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-var program = require('commander'),
+var _ = require('highland'),
+    program = require('commander'),
     pkg = require('../package.json'),
-    processFilings = require('../'),
+    parser = require('../'),
     fs = require('fs');
 
 program
@@ -11,7 +12,14 @@ program
 program
     .usage('<filings path> <data path>')
     .action((filingsPath, dataPath, options) => {
-        processFilings(filingsPath,dataPath);
+        _(parser(filingsPath))
+            .flatten()
+            .flatMap((filing) => {
+                console.log(filing.file);
+
+                return _(filing.save(dataPath))
+            })
+            .done(() => console.log('done'));
     });
 
 program.parse(process.argv);
