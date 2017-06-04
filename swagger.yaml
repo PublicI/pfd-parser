@@ -1,4 +1,4 @@
-swagger: '2.0'
+# swagger: '2.0'
 info:
   description: >-
     Public financial disclosure data from OGE form 278e. Entries should be read
@@ -11,6 +11,9 @@ paths: {}
 definitions:
   filer-s-positions-held-outside-united-states-government:
     title: 1. Filer's Positions Held Outside United States Government
+    aliases:
+      - 1. Filer Positions Held outside United States Government
+      - 1. Filer's Positions Held Outside the United States Government
     description: >-
       Part 1 discloses positions that the filer held at any time during the
       reporting period (excluding positions with the United States Government).
@@ -23,24 +26,33 @@ definitions:
       member of a limited liability company.
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       organization-name:
         type: string
+        aliases:
+          - name
       city-state:
         type: string
       organization-type:
         type: string
+        aliases:
+          - oge-type
+          - org-type
       position-held:
         type: string
+        aliases:
+          - position
       from:
         type: string
       to:
         type: string
   filer-s-employment-assets-&-income-and-retirement-accounts:
     title: 2. Filer's Employment Assets & Income and Retirement Accounts
+    aliases:
+      - 2. Filer's Employment Assets and Income
     description: >-
       Part 2 discloses the following: Sources of earned and other non-investment
       income of the filer totaling more than $200 during the reporting period
@@ -60,8 +72,8 @@ definitions:
       (EIF).
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       description:
@@ -76,6 +88,8 @@ definitions:
         type: string
   filer-s-employment-agreements-and-arrangements:
     title: 3. Filer's Employment Agreements and Arrangements
+    aliases:
+      - 3. Filer Employment Agreements and Arrangements
     description: >-
       Part 3 discloses agreements or arrangements that the filer had during the
       reporting period with an employer or former employer (except the United
@@ -89,12 +103,14 @@ definitions:
       options, restricted stock, future share of a company's profits, etc.).
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       employer-or-party:
         type: string
+        aliases:
+          - employer-other-party-to-agreement-arrangement
       city-state:
         type: string
       status-and-terms:
@@ -114,18 +130,24 @@ definitions:
       the services for which the client is paying.
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       source-name:
         type: string
+        aliases:
+          - name
       city-state:
         type: string
       brief-description-of-duties:
         type: string
+        aliases:
+          - description
   spouse-s-employment-assets-&-income-and-retirement-accounts:
     title: 5. Spouse's Employment Assets & Income and Retirement Accounts
+    aliases:
+      - 5. Spouse's Employment Assets and Income
     description: >-
       Part 5 discloses the following: Sources of earned income (excluding
       honoraria) for the filer's spouse totaling more than $1,000 during the
@@ -147,8 +169,8 @@ definitions:
       earned income (excluding honoraria).
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       description:
@@ -180,8 +202,8 @@ definitions:
       asset qualifies as an excepted investment fund (EIF).
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       description:
@@ -207,8 +229,8 @@ definitions:
       Additional exceptions apply.
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       description:
@@ -233,24 +255,30 @@ definitions:
       reporting period. Additional exceptions apply.
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       creditor-name:
         type: string
       type:
         type: string
+        aliases:
+          - type-of-liability
       amount:
         type: string
       year-incurred:
         type: string
       rate:
         type: string
+        aliases:
+          - interest-rate
       term:
         type: string
   gifts-and-travel-reimbursements:
     title: 9. Gifts and Travel Reimbursements
+    aliases:
+      - 9. Gifts and Reimbursements
     description: >-
       This section discloses: Gifts totaling more than $375 that the filer, the
       filer's spouse, and dependent children received from any one source during
@@ -270,8 +298,8 @@ definitions:
       Additional exceptions apply.
     type: object
     properties:
-      file:
-        type: string
+#      file:
+#        type: string
       '#':
         type: string
       source-name:
@@ -286,8 +314,8 @@ definitions:
     title: Endnotes
     type: object
     properties:
-      file:
-        type: string
+ #     file:
+ #       type: string
       part:
         type: string
       '#':
