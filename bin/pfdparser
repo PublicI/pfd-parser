@@ -14,11 +14,8 @@ program
     .action((filingsPath, dataPath, options) => {
         _(parser(filingsPath))
             .flatten()
-            .flatMap((filing) => {
-                console.log(filing.file);
-
-                return _(filing.save(dataPath))
-            })
+            .flatMap((filing) => _(filing.save(dataPath)))
+            .each((filing) => console.log('"' + filing.file + '",' + filing.count))
             .done(() => console.log('done'));
     });
 
