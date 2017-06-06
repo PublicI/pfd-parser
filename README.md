@@ -113,7 +113,7 @@ gifts-and-travel-reimbursements.csv
 | value |
 
 ## Endnotes
-endotes.csv
+endnotes.csv
 
 | Column |
 | ---- |

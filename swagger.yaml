@@ -145,7 +145,7 @@ definitions:
         aliases:
           - description
   spouse-s-employment-assets-&-income-and-retirement-accounts:
-    title: 5. Spouse's Employment Assets & Income and Retirement Accounts
+    title: 5. Spouse's Employment Assets & Income and Retirement accounts
     aliases:
       - 5. Spouse's Employment Assets and Income
     description: >-
@@ -310,7 +310,7 @@ definitions:
         type: string
       value:
         type: string
-  endotes:
+  endnotes:
     title: Endnotes
     type: object
     properties:
