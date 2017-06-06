@@ -1,14 +1,16 @@
 Parses public financial disclosure data from OGE form 278e.
 
-### Parts
+### Output
 ---
+
+Outputs up to 10 CSVs with data from the disclosure files. The format is (briefly) documented here.
 
 Entries should be read with the employee's separate ethics agreement and the endnotes included in the final table, which often indicate whether the employee intends to divest the asset upon entering government.
 
 ## 1. Filer's Positions Held Outside United States Government
 filer-s-positions-held-outside-united-states-government.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | organization-name |
@@ -21,7 +23,7 @@ filer-s-positions-held-outside-united-states-government.csv
 ## 2. Filer's Employment Assets & Income and Retirement Accounts
 filer-s-employment-assets-&-income-and-retirement-accounts.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | description |
@@ -33,7 +35,7 @@ filer-s-employment-assets-&-income-and-retirement-accounts.csv
 ## 3. Filer's Employment Agreements and Arrangements
 filer-s-employment-agreements-and-arrangements.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | employer-or-party |
@@ -44,7 +46,7 @@ filer-s-employment-agreements-and-arrangements.csv
 ## 4. Filers Sources of Compensation Exceeding $5,000 in a Year
 filer-s-sources-of-compensation-exceeding-$5-000-in-a-year.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | source-name |
@@ -54,7 +56,7 @@ filer-s-sources-of-compensation-exceeding-$5-000-in-a-year.csv
 ## 5. Spouse's Employment Assets & Income and Retirement accounts
 spouse-s-employment-assets-&-income-and-retirement-accounts.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | description |
@@ -66,7 +68,7 @@ spouse-s-employment-assets-&-income-and-retirement-accounts.csv
 ## 6. Other Assets and Income
 other-assets-and-income.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | description |
@@ -78,7 +80,7 @@ other-assets-and-income.csv
 ## 7. Transactions
 transactions.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | description |
@@ -89,7 +91,7 @@ transactions.csv
 ## 8. Liabilities
 liabilities.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | creditor-name |
@@ -102,7 +104,7 @@ liabilities.csv
 ## 9. Gifts and Travel Reimbursements
 gifts-and-travel-reimbursements.csv
 
-| Name |
+| Column |
 | ---- |
 | # |
 | source-name |
@@ -113,7 +115,7 @@ gifts-and-travel-reimbursements.csv
 ## Endnotes
 endotes.csv
 
-| Name |
+| Column |
 | ---- |
 | part |
 | # |
