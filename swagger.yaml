@@ -110,7 +110,7 @@ definitions:
       employer-or-party:
         type: string
         aliases:
-          - employer-other-party-to-agreement-arrangement
+          - employer-or-other-party-to-agreement-arrangement
       city-state:
         type: string
       status-and-terms:
@@ -145,7 +145,7 @@ definitions:
         aliases:
           - description
   spouse-s-employment-assets-&-income-and-retirement-accounts:
-    title: 5. Spouse's Employment Assets & Income and Retirement accounts
+    title: 5. Spouse's Employment Assets & Income and Retirement Accounts
     aliases:
       - 5. Spouse's Employment Assets and Income
     description: >-

@@ -12,28 +12,28 @@ const integrityFiling = filingPath + 'Kushner, Jared.pdf',
     fdOnlineFiling = filingPath + 'Mashburn, Lori K.pdf';
 
 describe('lib/parser.js', () => {
-    it('should find 10 tables in Integrity filing', (done) => {
+    it('should find seven tables in Integrity filing', (done) => {
         parser(integrityFiling)
             .then((filings) => {
-                filings[0].tables.length.should.equal(10);
+                filings[0].tables.length.should.equal(7);
 
                 done();
             });
     }).timeout(4000);
 
-    it('should find 9 tables in example FDM filing', (done) => {
+    it('should find seven tables in example FDM filing', (done) => {
         parser(fdmFiling)
             .then((filings) => {
-                filings[0].tables.length.should.equal(9);
+                filings[0].tables.length.should.equal(7);
 
                 done();
             });
     });
 
-    it('should find 10 tables in example FDonline filing', (done) => {
+    it('should find seven tables in example FDonline filing', (done) => {
         parser(fdOnlineFiling)
             .then((filings) => {
-                filings[0].tables.length.should.equal(10);
+                filings[0].tables.length.should.equal(7);
 
                 done();
             });
