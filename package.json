@@ -21,5 +21,11 @@
   "devDependencies": {
     "chai": "^4.0.0",
     "mocha": "^3.4.2"
+  },
+  "bin": {
+    "pfdparser": "./bin/pfdparser"
+  },
+  "pkg": {
+    "assets": "swagger.yaml"
   }
 }
