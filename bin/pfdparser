@@ -12,14 +12,13 @@ program
 program
     .usage('<filings path> <data path>')
     .action((filingsPath, dataPath, options) => {
+        console.log('file,lines');
+
         _(parser(filingsPath))
             .flatten()
-            .flatMap((filing) => {
-                console.log(filing.file);
-
-                return _(filing.save(dataPath))
-            })
-            .done(() => console.log('done'));
+            .flatMap(filing => _(filing.save(dataPath)) )
+            .each(filing => console.log('"' + filing.file + '",' + filing.count))
+            .done(() => {});
     });
 
 program.parse(process.argv);
