@@ -12,6 +12,10 @@ npm i -g github:publici/pfd-parser
 pfdparser /path/to/filings/ /path/to/data/folder/
 ```
 
+## Input
+
+Takes a single or a folder full of OGE 278e disclosure PDFs as input. You can find [many here](https://extapps2.oge.gov/201/Presiden.nsf/PAS%20Filings%20by%20Date?OpenView). Also handles 278s from FDM or FDonline. Does not handle scanned paper or non-standard PDFs.
+
 ## Output
 
 Outputs up to 10 CSVs with data from the disclosure files. The format is (briefly) documented here.
