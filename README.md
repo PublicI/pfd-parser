@@ -1,7 +1,18 @@
 Parses public financial disclosure data from OGE form 278e.
 
-### Output
----
+## Installation
+
+```sh
+npm i -g github:publici/pfd-parser
+```
+
+## Usage
+
+```sh
+pfdparser /path/to/filings/ /path/to/data/folder/
+```
+
+## Output
 
 Outputs up to 10 CSVs with data from the disclosure files. The format is (briefly) documented here.
 
