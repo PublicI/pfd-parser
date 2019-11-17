@@ -13,7 +13,7 @@
     "commander": "^2.9.0",
     "d3-dsv": "^1.0.3",
     "highland": "^2.10.5",
-    "js-yaml": "^3.8.4",
+    "js-yaml": "^3.13.1",
     "lodash.clonedeep": "^4.5.0",
     "pdfjs-dist": "^1.6.483",
     "vinyl-fs": "^2.4.4"
